@@ -4,70 +4,93 @@ Documentacion tecnica para prueba tecnica
 
 ![alt text](image.png)
 
-"/" del api creado en esta prueba tecnica
+"/" del la aplicacion creada en esta prueba tecnica
 
 ## Requisitos e instalacion
 
-Como primer requisito previo para la utilizacion de este proyecto es necesario la creacion de un ambiente virtual de python3 con el comando
+docker con sesion iniciada
 
-`python3 -m venve "ruta-del-venv"`
+checar si hay algun contenedor corriendo, si es el caso
+`docker ps -a` si es el caso
 
-Posteriormente la instalacion de dependencia mediante el archivo de dependencia y el manejador de paquetes pip
+`docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)`
 
-`pip install -r dependecies.txt`
+uso anidado de 4 comandos de docker para limpiar ejecuciones alternas (solo neceario si hay contenendores de next o postgress en el mismo cliente host de docker)
+
+remover archivos de contenedores alternos o versiones viejas del build de esta misma aplicacion
+
+`docker compose down -v`
+
+`docker compose down --remove-orphans`
+
+\*Nota, ejecuciones alterna no dockerizadas tambien pueden interferir en la ejecucion del build y funcionamiento de esta aplicacion.
 
 ## Variables de entorno
 
 Variables privada de entorno necesarias para poder usar el API y la base de datos (SQLite)
 
-| Nombre de variable  | Descripcion                                             |
-| ------------------- | ------------------------------------------------------- |
-| AUTH0_DOMAIN        | Dominio de la api de autenticacion                      |
-| AUTH0_CLIENT_ID     | Identificador de cliente del api de autetificacion      |
-| AUTH0_CLIENT_SECRET | Cadena secreta de proteccion de la api de autenticacion |
-| AUTH0_AUDIENCE      | Identifacdor del destinatario del token de autorizacion |
-| DATABASE_URL        | Ruta (en este caso fisica) del archivo de SQLite        |
+| Nombre de variable | Descripcion                                 |
+| ------------------ | ------------------------------------------- |
+| DATABASE_URL       | Dominio de la api de autenticacion          |
+| POSTGRES_USER      | Usuario creado en el motor de base de datos |
+| POSTGRES_PASSWORD  | Contraseña apara el mismo                   |
+| POSTGRES_DB        | nombre de la base de datos                  |
 
 ## Uso
 
-Previo a la isntalacion de requisitos de dependencias asi como la adquisision de valores para las varaibles de entorno. es necesario usar el comando `uvicorn main:app --reload --port 8080` en el directorio `app/` para evitar conflictos de puertos previamente no cerrados. Teniendo el proyecto corriendo podemos proceder al siguiente punto.
+Teniendo nuestro host limpio de otros contenedores:
 
-### Rutas
+`docker compose up --build -d`
 
-Se implemento proteccion de rutas mediante los servicios de Auth0 teniendo como resultado las siguientes divisiones
+generamos una instancia de la imagen de my aplicacion de Next y una de mi instancia preconfigurada de PostgreSQL
+ambas proporcionada en este repositorio por el mismo Dockerfile.
 
-#### Publicas
+Cabe recalcar que la imagen necesaria de postgres es propia y esta alojada en DockerHub y se puede consultar como
 
-`/` o Inicio
+- [netrix4/psotgress_preconfig:v1.1](https://hub.docker.com/repository/docker/netrix4/psotgres_preconfig/general)
 
-Esta es la ruta principal del api
+Al terminar la generacion del contenedor estaran corriendo dos contenedores, `LKMXTECHTESTNEXTJSContainer` y `LKMXTECHTESTDBContainer` en el puerto 3000 y 5432 respectivamente.
 
+Ahora podemos ir a localhost:3000 o su equivalente en el puerto 3000 y consultar la aplicacion en cuestion.
 
-`/public/products/`
+## Rutas
 
-`/products/{id}`
+_Inicio_ o '/'
 
-Endpoint de consulta de un producto por id
+Esta es la ruta principal del proyecto web
 
-![alt text](image-4.png)
-
-
-`/products/` (POST)
-Endpoint para agregar un producto nuevo (enviado en el body), retornando el producto recien argegado
-
-![alt text](image-5.png)
-
-#### Protegidas
+![alt text](image-1.png)
 
 `/products/`
 
-Endpoint privado para consulta solo con autentificacion previa (Bearer token requerido)
+Pagina para agregar un producto nuevo mediante un form basico,
+
+![alt text](image-2.png)
+
+`/api/products/` (POST)
+
+Endpoint para agregar un producto
+
+![alt text](image-5.png)
+
+`/api/products/` (GET)
+
+Endpoint para consultar todos los productos
+
+![alt text](image-3.png)
+
+`/api/products/{id}`
+
+Endpoint de consulta de un producto por id
 
 ![alt text](image-6.png)
 
+`/api/analytics/`
 
-## Migracion de Base de Datos
+Enpoint para consultar los producto con mayor costo a 30 debido a requirimientos de negocio (endpoint de agregacion)
 
-Como se puede ver en las dependencias se implemento Alchemic para migracion de base de datos mapeando modelos con tablas. Resultando en la siguiente evidencia
+![alt text](image-4.png)
 
-![alt text](image-16.png)
+### Comentarios adicionales
+
+La realizacion de esta dockerizacion enfrentó importantes adversidades debido a la liberacion de versiones recientes inestables de docker y PostgrereSQL demorando horas lo que debió tomar minutos. En todo caso: el objetivo se logro.
