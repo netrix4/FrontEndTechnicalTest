@@ -1,24 +1,20 @@
-# Imagen base
-FROM node:20-alpine
-
-# Directorio de trabajo
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copiar package.json
+# Install depencies to get Node to work
 COPY package*.json ./
-
-# Instalar dependencias
 RUN npm install
 
-# Copiar proyecto
+# Copies NextJS app to working directory
 COPY . .
-
-# Generar prisma
 RUN npx prisma generate
-
-# Build
 RUN npm run build
+
+FROM node:20-alpine
+WORKDIR /app
+COPY --from=builder /app ./
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Ensure prisma get databse information as well as configurations
+CMD npx prisma generate && npx prisma db push --accept-data-loss && npm run start

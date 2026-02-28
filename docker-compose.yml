@@ -1,9 +1,11 @@
-version: "3.9"
-
 services:
   db:
-    image: postgres:18
-    container_name: products_postgres
+    # Used a custom dockerimage with a preconfigured PostgreSQL 16
+    # because of the buggy 18 realease of postgres and to not depend
+    # on prismas migrations only
+    image: psotgres_preconfig:latest
+    # Add postgres custom user configurations
+    container_name: LKMXTECHTESTDBContainer
     restart: always
     environment:
       POSTGRES_USER: lkmx
@@ -16,14 +18,25 @@ services:
 
   web:
     build: .
-    container_name: next_app
+    container_name: LKMXTECHTESTNEXTJSContainer
     restart: always
     ports:
       - "3000:3000"
     environment:
+      # References now to db instead of localhost (127.0.0.0), in
+      # other words references to LKMXTECHTESTDBContainer' Postgress
+      # instance
       DATABASE_URL: postgresql://lkmx:mypassword@db:5432/productsdb
     depends_on:
       - db
 
+    # Implements a healtcheck to wait for LKMXTECHTESTDBContainer to
+    # be create and strated
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lkmx -d productsdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
-  postgres_data: 
+  postgres_data:

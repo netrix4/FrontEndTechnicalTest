@@ -3,11 +3,20 @@ import { NextRequest } from "next/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const id = (await params).id;
-    const product = await GETProductById(Number(id));
+    const { id } = await context.params;
+    // const id = (await context.params).id;
+    // const id = context.params.id;
+
+    const numericId = Number(id);
+
+    if (isNaN(numericId)) {
+      return Response.json({ error: "Invalid ID" }, { status: 400 });
+    }
+
+    const product = await GETProductById(Number(numericId));
 
     return Response.json(product);
   } catch (error) {

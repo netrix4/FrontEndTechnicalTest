@@ -7,6 +7,7 @@ const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
 export async function GETProducts() {
+  
   const products = await prisma.products.findMany();
   return products;
 }
