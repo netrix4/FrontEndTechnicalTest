@@ -1,7 +1,7 @@
-import { ADDProduct, GETProduct } from "@/app/service/productService";
+import { ADDProduct, GETProducts } from "@/app/service/productService";
 
 export async function GET(request: Request) {
-  const products = await GETProduct();
+  const products = await GETProducts();
   return new Response(JSON.stringify(products), {
     status: 200,
     headers: { "Content-Type": "application/json" },

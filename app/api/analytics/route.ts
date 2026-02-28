@@ -1,7 +1,7 @@
-import { GETProduct } from "@/app/service/productService";
+import { GETProducts } from "@/app/service/productService";
 
 export async function GET(request: Request) {
-  const products = await GETProduct();
+  const products = await GETProducts();
 
   // Get to know top expensive product is due to a busines rule or requirement
   const filteredProducts = products.filter((product) => product.price > 30);
