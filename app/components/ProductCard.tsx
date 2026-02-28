@@ -1,7 +1,10 @@
-import React from 'react'
+import React from "react";
+import { Product } from "@/app/model/product";
 
-export default function ProductCard() {
-  return (
-    <div>ProductCard</div>
-  )
+interface ProductCardProps {
+  product: Product;
+}
+
+export default function ProductCard({ product }: ProductCardProps) {
+  return <div>ProductCard</div>;
 }
