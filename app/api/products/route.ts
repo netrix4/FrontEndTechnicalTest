@@ -1,6 +1,6 @@
 import { ADDProduct, GETProducts } from "@/app/service/productService";
 
-export async function GET(request: Request) {
+export async function GET() {
   const products = await GETProducts();
   return new Response(JSON.stringify(products), {
     status: 200,
