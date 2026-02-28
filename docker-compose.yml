@@ -3,7 +3,7 @@ services:
     # Used a custom dockerimage with a preconfigured PostgreSQL 16
     # because of the buggy 18 realease of postgres and to not depend
     # on prismas migrations only
-    image: psotgres_preconfig:latest
+    image: psotgres_preconfig:v1.1
     # Add postgres custom user configurations
     container_name: LKMXTECHTESTDBContainer
     restart: always
