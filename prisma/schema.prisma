@@ -12,3 +12,10 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model products {
+  id   Int    @id @default(autoincrement())
+  name String
+  description String
+  price Int
+}
