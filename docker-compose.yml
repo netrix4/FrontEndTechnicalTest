@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:18
+    container_name: products_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: lkmx
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: productsdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: next_app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://lkmx:mypassword@db:5432/productsdb
+    depends_on:
+      - db
+
+volumes:
+  postgres_data: 
